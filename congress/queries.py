@@ -16,6 +16,9 @@ from senate.models import Committee
 # >>> execfile('queries.py')
 
 ##############################################################################
+# Query 1 -  Return the statecode, county name and 2010 population of all
+# counties who had a population of over 2,000,000 in 2010. Return the rows in
+# descending order from most populated to least
 print('Query 1')
 ##############################################################################
 
@@ -31,6 +34,8 @@ for county in counties:
         county['statecode'], county['name'], county['population_2010']))
 
 ##############################################################################
+# Query 2 -  Return a list of statecodes and the number of counties in that
+# state, ordered from the least number of counties to the most
 print('\nQuery 2')
 ##############################################################################
 
@@ -46,6 +51,8 @@ for county in counties:
     print('{}|{}'.format(county['statecode'], county['counties_per_state']))
 
 ##############################################################################
+# Query 3  - On average how many counties are there per state (return a single
+# real number)
 print('\nQuery 3')
 ##############################################################################
 
@@ -62,6 +69,8 @@ avg_counties = avg_counties.aggregate(avg_counties=Avg('counties_per_state')) \
 print(avg_counties)
 
 ##############################################################################
+# Query 4 - return a count of how many states have more than the average number
+# of counties
 print('\nQuery 4')
 ##############################################################################
 
@@ -84,6 +93,8 @@ count_states_more_than_avg =  count_states_more_than_avg.count()
 print(count_states_more_than_avg)
 
 ##############################################################################
+# Query 5 - Data Cleaning - return the statecodes of states whose 2010
+# population does not equal the sum of the 2010 populations of their counties
 print('\nQuery 5')
 ##############################################################################
 
@@ -111,6 +122,8 @@ for state in states:
     print(state)
 
 ##############################################################################
+# Query 6 - How many states have at least one senator whose first name is John,
+# Johnny, or Jon? (return a single integer)
 print('\nQuery 6')
 ##############################################################################
 
@@ -127,6 +140,11 @@ num_jon = num_jon.count()
 print(num_jon)
 
 ##############################################################################
+# Query 7 - Find all the senators who were born in a year before the year their
+# state was admitted to the union.   For each, output the statecode, year the
+# state was admitted to the union, senator name, and year the senator was born.
+# Note: in SQLite you can extract the year as an integer using the following:
+# "cast(strftime('%Y',admitted_to_union) as integer)"
 print('\nQuery 7')
 ##############################################################################
 
@@ -165,6 +183,10 @@ for sen in sen_list:
 '''
 
 ##############################################################################
+# Query 8 - Find all the counties of West Virginia (statecode WV) whose
+# population shrunk between 1950 and 2010, and for each, return the name of the
+# county and the number of people who left during that time (as a positive
+# number).
 print('\nQuery 8')
 ##############################################################################
 
@@ -185,6 +207,8 @@ for county in wv_counties:
     print('{}|{}'.format(county['name'], county['pop_diff']))
 
 ##############################################################################
+# Query 9 - Return the statecode of the state(s) that is (are) home to the most
+# committee chairmen
 print('\nQuery 9')
 ##############################################################################
 
@@ -208,6 +232,8 @@ for state in states_with_max:
     print('{}'.format(state['chairman__statecode']))
 
 ##############################################################################
+# Query 10 - Return the statecode of the state(s) that are not the home of any
+# committee chairmen
 print('\nQuery 10')
 ##############################################################################
 
@@ -226,6 +252,10 @@ for state in st_without_chairmen:
     print('{}'.format(state['statecode']))
 
 ##############################################################################
+# Query 11 Find all subcommittes whose chairman is the same as the chairman of
+# its parent committee.  For each, return the id of the parent committee, the
+# name of the parent committee's chairman, the id of the subcommittee, and name
+# of that subcommittee's chairman
 print('\nQuery 11')
 ##############################################################################
 
@@ -243,6 +273,11 @@ for sc in sc_same_chairman:
         sc['id'], sc['chairman']))
 
 ##############################################################################
+# Query 12 - For each subcommittee where the subcommittee’s chairman was born in
+# an earlier year than the chairman of its parent committee,  Return the id of
+# the parent committee,  its chairman, the year the chairman was born, the id of
+# the submcommittee, it’s chairman and the year the subcommittee chairman was
+# born.
 print('\nQuery 12')
 ##############################################################################
 
@@ -263,6 +298,9 @@ for sc in sc_earlier_birth:
         sc['id'], sc['chairman'], sc['chairman__born']))
 
 ##############################################################################
+# Query 13 - Berkeley, CA became it's own county! Insert a new county with the
+# name Berkeley in California, with a 1950 population of 113,805 and a 2010
+# population of 112580.
 print('\nQuery 13')
 ##############################################################################
 
@@ -273,6 +311,8 @@ for county in County.objects.filter(name='Berkeley'):
     print(county.statecode.statecode)
 
 ##############################################################################
+# Query 14 - But it didn't last very long. Remove the newly created Berkeley
+# county.
 print('\nQuery 14')
 ##############################################################################
 
