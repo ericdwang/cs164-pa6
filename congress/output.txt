@@ -1,4 +1,3 @@
- 
 Query 1
 CA|Los Angeles|9818605
 IL|Cook|5194675
@@ -12,7 +11,7 @@ TX|Dallas|2368139
 NY|Queens|2230722
 CA|Riverside|2189641
 CA|San Bernardino|2035210
- 
+
 Query 2
 DE|3
 HI|5
@@ -64,25 +63,25 @@ KY|120
 VA|136
 GA|159
 TX|254
- 
+
 Query 3
 62.9
- 
+
 Query 4
 25
- 
+
 Query 5
 AZ
 CT
- 
+
 Query 6
 9
- 
+
 Query 7
 AK|1959|Lisa Murkowski|1957
 HI|1959|Daniel Akaka|1924
 HI|1959|Daniel Inouye|1924
- 
+
 Query 8
 Barbour|3156
 Boone|8544
@@ -121,12 +120,12 @@ Tyler|1327
 Webster|8734
 Wetzel|3571
 Wyoming|13744
- 
+
 Query 9
 MI
 RI
 WA
- 
+
 Query 10
 AL
 AZ
@@ -144,10 +143,10 @@ TN
 TX
 UT
 WY
- 
+
 Query 11
 APR|Daniel Inouye|APR3|Daniel Inouye
- 
+
 Query 12
 ANF|Debbie Stabenow|1950|ANF1|Ben Nelson|1941
 CST|Jay Rockefeller|1937|CST7|Frank Lautenberg|1924
