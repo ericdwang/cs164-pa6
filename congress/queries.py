@@ -23,6 +23,9 @@ counties = County.objects.filter(population_2010__gt=2000000) \
     .values('statecode', 'name', 'population_2010') \
     .order_by('-population_2010')
 
+print(counties.query)
+print('')
+
 for county in counties:
     print('{}|{}|{}'.format(
         county['statecode'], county['name'], county['population_2010']))
@@ -36,6 +39,9 @@ counties = County.objects.all() \
     .annotate(counties_per_state=Count('statecode')) \
     .order_by('counties_per_state')
 
+print(counties.query)
+print('')
+
 for county in counties:
     print('{}|{}'.format(county['statecode'], county['counties_per_state']))
 
@@ -46,7 +52,11 @@ print('\nQuery 3')
 avg_counties = County.objects.all() \
     .values('statecode') \
     .annotate(counties_per_state=Count('statecode')) \
-    .aggregate(avg_counties=Avg('counties_per_state')) \
+
+print(avg_counties.query)
+print('')
+
+avg_counties = avg_counties.aggregate(avg_counties=Avg('counties_per_state')) \
     .values()[0]
 
 print(avg_counties)
@@ -65,7 +75,11 @@ count_states_more_than_avg = County.objects.all() \
     .values('statecode') \
     .annotate(num_state=Count('statecode')) \
     .filter(num_state__gt=avg_counties) \
-    .count()
+
+print(count_states_more_than_avg.query)
+print('')
+
+count_states_more_than_avg =  count_states_more_than_avg.count()
 
 print(count_states_more_than_avg)
 
@@ -104,7 +118,11 @@ num_jon = Senator.objects \
     .filter(Q(name__startswith='John') | Q(name__startswith='Jon')) \
     .values('statecode') \
     .distinct() \
-    .count()
+
+print(num_jon.query)
+print('')
+
+num_jon = num_jon.count()
 
 print(num_jon)
 
@@ -160,6 +178,9 @@ wv_counties = County.objects \
     .extra( select={'pop_diff':'population_1950 - population_2010'}) \
     .values('name', 'pop_diff')
 
+print(wv_counties.query)
+print('')
+
 for county in wv_counties:
     print('{}|{}'.format(county['name'], county['pop_diff']))
 
@@ -171,7 +192,7 @@ num_chairmen = Committee.objects \
     .select_related() \
     .values('chairman__statecode') \
     .annotate(pop_sum=Count('chairman__statecode'))
-   
+
 max_chairmen = num_chairmen \
     .aggregate(max_pop=Max('pop_sum')) \
     .values()[0]
@@ -179,6 +200,9 @@ max_chairmen = num_chairmen \
 states_with_max = num_chairmen \
     .filter(pop_sum__gte=max_chairmen) \
     .values('chairman__statecode')
+
+print(states_with_max.query)
+print('')
 
 for state in states_with_max:
     print('{}'.format(state['chairman__statecode']))
@@ -195,6 +219,9 @@ st_without_chairmen = State.objects.all() \
     .exclude(statecode__in=st_with_chairmen) \
     .values('statecode')
 
+print(st_without_chairmen.query)
+print('')
+
 for state in st_without_chairmen:
     print('{}'.format(state['statecode']))
 
@@ -207,6 +234,9 @@ sc_same_chairman = Committee.objects \
     .filter(parent_committee__chairman__exact=F('chairman')) \
     .values('parent_committee__id', 'parent_committee__chairman', \
         'id', 'chairman')
+
+print(sc_same_chairman.query)
+print('')
 
 for sc in sc_same_chairman:
     print('{}|{}|{}|{}'.format(sc['parent_committee__id'], sc['parent_committee__chairman'], \
@@ -223,6 +253,9 @@ sc_earlier_birth = Committee.objects \
     .values('parent_committee__id', 'parent_committee__chairman', \
         'parent_committee__chairman__born', 'id', 'chairman', \
         'chairman__born')
+
+print(sc_earlier_birth.query)
+print('')
 
 for sc in sc_earlier_birth:
     print('{}|{}|{}|{}|{}|{}'.format(sc['parent_committee__id'], \
