@@ -94,7 +94,10 @@ print('\nQuery 7')
 # This isn't possible without casting in the database...
 # However, the ORM doesn't really let us cast on a key in a foreign table,
 # so there's no real way to do this.
+print('Unimplemented')
 
+# This is what it would look like if we could access foreign key fields in
+# an extra statement
 '''
 sen_list1 = Senator.objects \
     .select_related() \
@@ -108,7 +111,8 @@ sen_list = sen_list1 \
 
 '''
 
-
+# This is the version that does comparisons on the uncasted date string
+'''
 sen_list = Senator.objects \
     .select_related() \
     .values('statecode', 'statecode__admitted_to_union', 'name', 'born') \
@@ -119,6 +123,7 @@ sen_list = Senator.objects \
 for sen in sen_list:
     print('{}|{}|{}|{}'.format(sen['statecode'], sen['statecode__admitted_to_union'], \
         sen['name'], sen['born']))
+'''
 
 ##############################################################################
 print('\nQuery 8')
@@ -141,19 +146,53 @@ for county in wv_counties:
 print('\nQuery 9')
 ##############################################################################
 
+# I don't think it's possible in the Django ORM to cleanly reference
+# a 'parent' query in a subquery, as we do in the SQL for this query.
+print('Unimplemented')
 
 ##############################################################################
 print('\nQuery 10')
 ##############################################################################
 
+st_with_chairmen = Committee.objects \
+    .select_related('chairman') \
+    .values('chairman__statecode')
+
+st_without_chairmen = State.objects.all() \
+    .exclude(statecode__in=st_with_chairmen) \
+    .values('statecode')
+
+for state in st_without_chairmen:
+    print('{}'.format(state['statecode']))
 
 ##############################################################################
 print('\nQuery 11')
 ##############################################################################
 
+sc_same_chairman = Committee.objects \
+    .select_related('chairman', 'parent_committee') \
+    .filter(parent_committee__chairman__exact=F('chairman')) \
+    .values('parent_committee__id', 'parent_committee__chairman', \
+        'id', 'chairman')
+
+for sc in sc_same_chairman:
+    print('{}|{}|{}|{}'.format(sc['parent_committee__id'], sc['parent_committee__chairman'], \
+        sc['id'], sc['chairman']))
 
 ##############################################################################
 print('\nQuery 12')
 ##############################################################################
 
+sc_earlier_birth = Committee.objects \
+    .select_related('chairman', 'parent_committee') \
+    .select_related('parent_committee__chairman') \
+    .filter(parent_committee__chairman__born__gt=F('chairman__born')) \
+    .values('parent_committee__id', 'parent_committee__chairman', \
+        'parent_committee__chairman__born', 'id', 'chairman', \
+        'chairman__born')
+    
+for sc in sc_earlier_birth:
+    print('{}|{}|{}|{}|{}|{}'.format(sc['parent_committee__id'], \
+        sc['parent_committee__chairman'], sc['parent_committee__chairman__born'], \
+        sc['id'], sc['chairman'], sc['chairman__born']))
 
