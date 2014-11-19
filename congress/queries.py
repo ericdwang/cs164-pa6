@@ -1,5 +1,6 @@
 from django.db.models import Avg
 from django.db.models import Count
+from django.db.models import Max
 from django.db.models import Q
 from django.db.models import F
 from django.db.models import Sum
@@ -166,23 +167,21 @@ for county in wv_counties:
 print('\nQuery 9')
 ##############################################################################
 
-# I don't think it's possible in the Django ORM to cleanly reference
-# a 'parent' query in a subquery, as we do in the SQL for this query.
-states = []
-max_chairmen = 0
-for state in State.objects.all():
-    senators = Senator.objects.filter(statecode=state)
-    num_chairmen = 0
-    for senator in senators:
-        num_chairmen += Committee.objects.filter(chairman=senator).count()
-    if num_chairmen == max_chairmen:
-        states.append(state.statecode)
-    elif num_chairmen > max_chairmen:
-        states = [state.statecode]
-        max_chairmen = num_chairmen
+num_chairmen = Committee.objects \
+    .select_related() \
+    .values('chairman__statecode') \
+    .annotate(pop_sum=Count('chairman__statecode'))
+   
+max_chairmen = num_chairmen \
+    .aggregate(max_pop=Max('pop_sum')) \
+    .values()[0]
 
-for state in states:
-    print(state)
+states_with_max = num_chairmen \
+    .filter(pop_sum__gte=max_chairmen) \
+    .values('chairman__statecode')
+
+for state in states_with_max:
+    print('{}'.format(state['chairman__statecode']))
 
 ##############################################################################
 print('\nQuery 10')
