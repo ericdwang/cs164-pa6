@@ -2,6 +2,7 @@ from django.db.models import Avg
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models import F
+from django.db.models import Sum
 
 from senate.models import County
 from senate.models import Senator
@@ -73,7 +74,26 @@ print('\nQuery 5')
 
 # I don't think it's possible in the Django ORM to cleanly reference
 # a 'parent' query in a subquery, as we do in the SQL for this query.
-print('Unimplemented')
+'''
+states = State.objects.exclude(population_2010=
+    County.objects.filter(statecode=CURRENT_STATE) \
+        .values('population_2010') \
+        .aggregate(total_population=Sum('population_2010')) \
+        .values()[0]
+    )
+'''
+
+states = []
+for state in State.objects.all():
+    total_population = County.objects.filter(statecode=state) \
+        .values('population_2010') \
+        .aggregate(total_population=Sum('population_2010')) \
+        .values()[0]
+    if total_population != state.population_2010:
+        states.append(state.statecode)
+
+for state in states:
+    print(state)
 
 ##############################################################################
 print('\nQuery 6')
@@ -101,7 +121,7 @@ print('Unimplemented')
 '''
 sen_list1 = Senator.objects \
     .select_related() \
-    .extra( select={'admit_year': "cast(strftime('%Y',statecode__admitted_to_union) as integer)"}) 
+    .extra( select={'admit_year': "cast(strftime('%Y',statecode__admitted_to_union) as integer)"})
 print(sen_list1)
 
 sen_list = sen_list1 \
@@ -148,7 +168,21 @@ print('\nQuery 9')
 
 # I don't think it's possible in the Django ORM to cleanly reference
 # a 'parent' query in a subquery, as we do in the SQL for this query.
-print('Unimplemented')
+states = []
+max_chairmen = 0
+for state in State.objects.all():
+    senators = Senator.objects.filter(statecode=state)
+    num_chairmen = 0
+    for senator in senators:
+        num_chairmen += Committee.objects.filter(chairman=senator).count()
+    if num_chairmen == max_chairmen:
+        states.append(state.statecode)
+    elif num_chairmen > max_chairmen:
+        states = [state.statecode]
+        max_chairmen = num_chairmen
+
+for state in states:
+    print(state)
 
 ##############################################################################
 print('\nQuery 10')
@@ -190,9 +224,27 @@ sc_earlier_birth = Committee.objects \
     .values('parent_committee__id', 'parent_committee__chairman', \
         'parent_committee__chairman__born', 'id', 'chairman', \
         'chairman__born')
-    
+
 for sc in sc_earlier_birth:
     print('{}|{}|{}|{}|{}|{}'.format(sc['parent_committee__id'], \
         sc['parent_committee__chairman'], sc['parent_committee__chairman__born'], \
         sc['id'], sc['chairman'], sc['chairman__born']))
 
+##############################################################################
+print('\nQuery 13')
+##############################################################################
+
+County.objects.create(
+    name='Berkeley', statecode=State.objects.get(statecode='CA'),
+    population_1950=113805, population_2010=112580)
+for county in County.objects.filter(name='Berkeley'):
+    print(county.statecode.statecode)
+
+##############################################################################
+print('\nQuery 14')
+##############################################################################
+
+County.objects.get(
+    name='Berkeley', statecode=State.objects.get(statecode='CA')).delete()
+for county in County.objects.filter(name='Berkeley'):
+    print(county.statecode.statecode)

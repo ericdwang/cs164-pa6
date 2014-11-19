@@ -149,3 +149,21 @@ from
     where sc.parent_committee = pc.id and pc.chairman = s1.name and sc.chairman = s2.name
 )
 where pc_born > sc_born;
+
+/*Query 13 - Berkeley, CA became it's own county! Insert a new county with the name Berkeley in California, with a 1950 population of 113,805 and a 2010 population of 112580. */
+select "";
+select "Query 13";
+insert into counties values (3146, 'Berkeley', 'CA', 113805, 112580);
+select statecode
+from counties
+where name = 'Berkeley';
+
+/*Query 14 - But it didn't last very long. Remove the newly created Berkeley
+ * county.*/
+select "";
+select "Query 14";
+delete from counties
+where name = 'Berkeley' and statecode = 'CA';
+select statecode
+from counties
+where name = 'Berkeley';
